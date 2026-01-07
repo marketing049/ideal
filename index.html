@@ -8,119 +8,103 @@
 <style>
 body {
   font-family: sans-serif;
-  background:#f5f5f5;
+  background: #f5f5f5;
 }
 .card {
-  background:#fff;
-  max-width:400px;
-  margin:40px auto;
-  padding:20px;
-  border-radius:10px;
+  background: #fff;
+  max-width: 420px;
+  margin: 40px auto;
+  padding: 20px;
+  border-radius: 12px;
 }
-.hidden { display:none; }
-
-.gender-row {
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-}
-.gender-btn {
-  flex:1;
-  padding:12px;
-  border:1px solid #ccc;
-  background:#fff;
-  cursor:pointer;
-}
-.gender-btn.active {
-  background:#000;
-  color:#fff;
-}
-
-textarea {
-  width:100%;
-  margin-top:10px;
-  padding:12px;
-  box-sizing:border-box;
-}
+.hidden { display: none; }
 
 button {
-  width:100%;
-  margin-top:15px;
-  padding:12px;
+  width: 100%;
+  padding: 14px;
+  margin-top: 10px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
 }
-.small {
-  font-size:12px;
-  color:#666;
+
+.primary {
+  background: #d4b15f;
+  color: #fff;
+}
+
+.secondary {
+  background: #eee;
+}
+
+.gender-row {
+  display: flex;
+  gap: 10px;
+}
+
+.gender-btn {
+  flex: 1;
+  background: #eee;
+}
+
+.gender-btn.active {
+  background: #d4b15f;
+  color: #fff;
+}
+
+img {
+  width: 100%;
+  border-radius: 12px;
+  filter: blur(14px);
 }
 </style>
 </head>
 
 <body>
 
-<!-- STEP 1 -->
+<!-- 1단계 -->
 <div class="card" id="step1">
-  <h3>1. 이상형을 적어주세요</h3>
-  <div class="small">(본인의 성별 체크 후 적어주세요.)</div>
-
-  <!-- 성별 선택 -->
+  <h3>본인 성별을 선택해주세요</h3>
   <div class="gender-row">
-    <button class="gender-btn" onclick="selectGender('남자')">남자</button>
-    <button class="gender-btn" onclick="selectGender('여자')">여자</button>
+    <button class="gender-btn" onclick="selectGender('남성')">남성</button>
+    <button class="gender-btn" onclick="selectGender('여성')">여성</button>
   </div>
-
-  <!-- 이상형 입력 -->
-  <textarea id="idealText" placeholder="입력하세요"></textarea>
-
-  <button onclick="toStep2()">다음</button>
 </div>
 
-<!-- STEP 2 -->
+<!-- 2단계 -->
 <div class="card hidden" id="step2">
-  <h3>본인이 적은 이상형이 맞나요?</h3>
+  <h3>비슷한 이상형의 프로필</h3>
+  <img id="previewImg" src="">
+  <button class="primary" onclick="goStep3()">얼굴 확인하기</button>
+</div>
 
-  <div id="genderPreview"></div>
-  <div id="preview" style="margin-top:10px;"></div>
+<!-- 3단계 -->
+<div class="card hidden" id="step3">
+  <h3>얼굴 확인을 위해 신청이 필요해요</h3>
 
-  <button onclick="confirmYes()">네</button>
-  <button onclick="confirmNo()">아니요</button>
+  <input id="name" placeholder="이름" style="width:100%;padding:12px;margin-top:10px">
+  <input id="birth" placeholder="89년생" style="width:100%;padding:12px;margin-top:10px">
+  <input id="region" placeholder="지역" style="width:100%;padding:12px;margin-top:10px">
+  <input id="phone" placeholder="010-1234-5678" style="width:100%;padding:12px;margin-top:10px">
+
+  <button class="primary" onclick="submitForm()">신청 완료</button>
 </div>
 
 <script>
-let selectedGender = "";
+/*** 🔴 네 Apps Script 웹앱 URL 넣어야 함 ***/
+const SCRIPT_URL = "https://script.google.com/macros/s/여기에_네_URL/exec";
 
+let userGender = "";
+
+/* 1단계 */
 function selectGender(gender) {
-  selectedGender = gender;
-  document.querySelectorAll('.gender-btn')
-    .forEach(btn => btn.classList.remove('active'));
+  userGender = gender;
+
+  document.querySelectorAll('.gender-btn').forEach(b => b.classList.remove('active'));
   event.target.classList.add('active');
-}
 
-function hideAll() {
-  document.querySelectorAll('.card')
-    .forEach(el => el.classList.add('hidden'));
-}
-
-function toStep2() {
-  document.getElementById("genderPreview").innerText =
-    "본인 성별: " + (selectedGender || "미선택");
-  document.getElementById("preview").innerText =
-    document.getElementById("idealText").value;
-
-  hideAll();
-  step2.classList.remove("hidden");
-}
-
-function confirmYes() {
-  console.log("본인 성별:", selectedGender);
-  console.log("이상형:", document.getElementById("idealText").value);
-  alert("STEP 2 확인 완료");
-}
-
-function confirmNo() {
-  hideAll();
-  step1.classList.remove("hidden");
-}
-</script>
-
-</body>
-</html>
+  // 남자면 여자사진 / 여자면 남자사진
+  const img = document.getElementById("previewImg");
+  img.src = gender === "남성"
+    ? "images/woman1.jpg"
